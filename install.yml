@@ -109,7 +109,7 @@ onBeforeInstall: |
   }
   if (dockerImage == "undefined") {
     node_cp['nodeType'] = "jahia";
-    node_cp['tag'] = "${globals.dx_version}";
+    node_cp['tag'] = "7.3.3.0_PAAS-692-add-unomi-key";
   } else {
     node_cp['image']  = dockerImage;
   }
@@ -142,7 +142,7 @@ onBeforeInstall: |
   }
   if (dockerImage == "undefined") {
     node_proc['nodeType'] = "jahia";
-    node_proc['tag'] = "${globals.dx_version}";
+    node_proc['tag'] = "7.3.3.0_PAAS-692-add-unomi-key";
   } else {
     node_proc['image']  = dockerImage;
   }

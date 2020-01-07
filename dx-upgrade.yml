@@ -14,11 +14,14 @@ onInstall:
   - cmd [proc]:
       - echo 'export JAHIA_UPGRADE="true"' >> /etc/locale.conf
     user: root
+
   - api: environment.control.RedeployContainersByGroup
     nodeGroup: proc
     tag: ${settings.targetVersion}
     useExistingVolumes: false
     skipReinstall: false
+    isSequential: ${settings.rollingUpgrade}
+    delay: 120000
     envName: ${env.envName}
   - cmd [proc]: |-
         touch /data/digital-factory-data/modules/*
@@ -27,11 +30,14 @@ onInstall:
     user: root
   - sleep:
       - milliseconds: 120000
+
   - api: environment.control.RedeployContainersByGroup
     nodeGroup: cp
     tag: ${settings.targetVersion}
     useExistingVolumes: false
     skipReinstall: false
+    isSequential: ${settings.rollingUpgrade}
+    delay: 120000
     envName: ${env.envName}
   - env.control.ApplyNodeGroupData[proc]:
       data:
@@ -39,16 +45,22 @@ onInstall:
         packageType: ${settings.packageType}
   - env.control.AddContainerEnvVars[cp, proc]:
       vars: {"DX_VERSION": "${settings.targetVersion}", "PACKAGE_TYPE": "${settings.packageType}"}
+
 settings:
   fields:
     - name: targetVersion
       type: string
       caption: DX Target Version
       vtype: text
-      required: true
+      required: false
     - name: packageType
       type: string
       caption: Package Type
       default: dev
       vtype: text
+      required: true
+    - name: rollingUpgrade
+      type: toogle
+      caption: Rolling upgrade ?
+      value: true
       required: true
