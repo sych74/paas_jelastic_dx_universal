@@ -73,6 +73,7 @@ actions:
               sudo -u tomcat touch "/data/digital-factory-data/[persisted-bundles].dorestore"
               sudo -u tomcat touch "/data/digital-factory-data/[persisted-configurations].dorestore"
               echo "restore-module-state have been asked"
+              ls -l /data/digital-factory-data/*.dorestore
             else
               echo "Can't use restore-module-state here"
             fi
