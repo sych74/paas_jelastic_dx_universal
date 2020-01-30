@@ -90,6 +90,7 @@ actions:
     - cmd [proc]: |-
         if [[ "${globals.upgradeJahia}" == "true" ]]; then
           touch /data/digital-factory-data/modules/*
+          sed 's/^\(JAVA_OPTS=.*\)"$/\1 -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000"/' -i /opt/tomcat/conf/tomcat-env.sh
           service tomcat start
         fi
         sed '/JAHIA_UPGRADE/d' -i /etc/locale.conf
