@@ -66,18 +66,6 @@ actions:
         - service tomcat stop
       user: root
     # restore-module-state is not compatible with rolling upgrade
-    - if (!${settings.rollingUpgrade}):
-        - cmd [proc]: |-
-            if [ $(echo $DX_VERSION | sed 's/\.//g') -gt 7311  ]; then
-              rm -fr /data/digital-factory-data/bundles-deployed/*
-              sudo -u tomcat touch "/data/digital-factory-data/[persisted-bundles].dorestore"
-              sudo -u tomcat touch "/data/digital-factory-data/[persisted-configurations].dorestore"
-              echo "restore-module-state have been asked"
-              ls -l /data/digital-factory-data/*.dorestore
-            else
-              echo "Can't use restore-module-state here"
-            fi
-          user: root
     - cmd [proc]:
         - echo 'export JAHIA_UPGRADE="${globals.upgradeJahia}"' >> /etc/locale.conf
       user: root
@@ -87,10 +75,22 @@ actions:
       useExistingVolumes: ${globals.useExistingVolumes}
       skipReinstall: false
       envName: ${env.envName}
+    - if (!${settings.rollingUpgrade}):
+        - cmd [proc]: |-
+            if [ $(echo $DX_VERSION | sed 's/\.//g') -gt 7311  ]; then
+              rm -fr /data/digital-factory-data/bundles-deployed/*
+              sudo -u tomcat touch "/data/digital-factory-data/[persisted-bundles].dorestore"
+              sudo -u tomcat touch "/data/digital-factory-data/[persisted-configurations].dorestore"
+              echo "restore-module-state have been asked"
+              ls -l /data/digital-factory-data/*.dorestore
+              # sed 's/^\(JAVA_OPTS=.*\)"$/\1 -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000"/' -i /opt/tomcat/conf/tomcat-env.sh
+            else
+              echo "Can't use restore-module-state here"
+            fi
+          user: root
     - cmd [proc]: |-
         if [[ "${globals.upgradeJahia}" == "true" ]]; then
           touch /data/digital-factory-data/modules/*
-          sed 's/^\(JAVA_OPTS=.*\)"$/\1 -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000"/' -i /opt/tomcat/conf/tomcat-env.sh
           service tomcat start
         fi
         sed '/JAHIA_UPGRADE/d' -i /etc/locale.conf
